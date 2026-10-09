@@ -1,0 +1,68 @@
+seed: 2024
+device: cpu
+output_dir: outputs
+run_name: dlinear_etth1_hffp
+
+data:
+  dataset: ETTh1
+  root_path: ./dataset
+  data_path: ETTh1.csv
+  date_col: date
+  features: M
+  target: OT
+  seq_len: 96
+  pred_len: 96
+  train_ratio: 0.7
+  val_ratio: 0.1
+  context_from_previous: true
+
+loader:
+  batch_size: 256
+  eval_batch_size: 256
+  hffp_batch_size: 128
+  num_workers: 0
+
+backbone:
+  name: DLinear
+  epochs: 10
+  patience: 3
+  lr: 0.001
+  weight_decay: 0.0
+  moving_avg: 25
+  individual: false
+
+hffp:
+  epochs: 10
+  patience: 3
+  lr: 0.001
+  weight_decay: 0.0
+  d_model: 128
+  d_ff: 256
+  n_heads: 4
+  layers: 2
+  dropout: 0.1
+  patch_len: 16
+  decomp_kernel: 25
+  use_risk_features: true
+  use_hidden_states: false
+  use_ranking_loss: true
+  ranking_weight: 0.2
+  ranking_margin: 0.0
+  ranking_num_pairs: 4096
+  ranking_target: error_ratio
+  ranking_target_clip: 5.0
+  ranking_min_target_diff: 0.0
+
+failure:
+  percentile: 90
+  decision_threshold: 0.5
+  loss: weighted_bce
+  use_pos_weight: true
+  focal_alpha: 0.75
+  focal_gamma: 2.0
+
+selective:
+  coverages: [1.0, 0.9, 0.8, 0.7, 0.6, 0.5]
+
+pipeline:
+  prediction_cache_dtype: float32
